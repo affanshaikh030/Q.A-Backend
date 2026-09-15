@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+sqlalchemy
+celery
+transformers
+torch
