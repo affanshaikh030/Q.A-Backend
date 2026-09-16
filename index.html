@@ -148,8 +148,8 @@
         </main>
     </div>
 
-    <script>
-        const API_BASE_URL = "https://affan0510-courier-qa-api.hf.space";
+    <script>;
+        const response = await fetch(`https://q-a-backend-1.onrender.com/api/tasks/${taskId}`)
         let currentPollingInterval = null;
 
         async function submitAudio() {
@@ -216,7 +216,7 @@
             
             currentPollingInterval = setInterval(async () => {
                 try {
-                    const response = await fetch(`https://affan0510-courier-qa-api.hf.space/tasks/${taskId}`);
+                    const response = await fetch(`https://q-a-backend-1.onrender.com/api/tasks/${taskId}`);
                     const task = await response.json();
                     
                     if (task.status === "COMPLETED") {
@@ -241,7 +241,7 @@
         async function loadTaskData(taskId) {
             try {
                 // 2. Send GET request to fetch results from database
-                const response = await fetch(`https://affan0510-courier-qa-api.hf.space/tasks/${taskId}`);
+                const response = await fetch(`https://q-a-backend-1.onrender.com/api/tasks/${taskId}`);
                 const task = await response.json();
                 
                 // Switch UI views
