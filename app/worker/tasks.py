@@ -16,14 +16,17 @@ celery_app = Celery("tasks", broker=broker_url, backend=result_backend)
 @shared_task
 def process_audio_task(audio_url: str, task_id: int):
     """
-    Downloads audio from the given URL and sends it to the Hugging Face 
+    Downloads audio from the given URL and sends it to the Hugging Face
     Inference API for transcription, completely bypassing local memory limits.
     """
     try:
         # 1. Download the audio file from the frontend URL
-        audio_response = requests.get(audio_url)
+        custom_headers = {"User-Agent": "CourierQA/1.0 (Testing)"}
+        audio_response = requests.get(audio_url, headers=custom_headers)
+        
         if audio_response.status_code != 200:
             return {"status": "error", "message": "Failed to fetch audio from URL."}
+        
 
         # 2. Send the binary audio data to Hugging Face
         hf_api_key = os.environ.get("HF_API_KEY")
