@@ -1,0 +1,27 @@
+{
+  "name": "ecommerce-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "npx @tailwindcss/cli -i ./input.css -o ./output.css --minify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/affanshaikh030/Q.A-Backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/affanshaikh030/Q.A-Backend/issues"
+  },
+  "homepage": "https://github.com/affanshaikh030/Q.A-Backend#readme",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "autoprefixer": "^10.6.1",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^4.3.3"
+  }
+}
