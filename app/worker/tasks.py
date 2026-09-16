@@ -6,6 +6,11 @@ from celery import Celery
 broker_url = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379")
 result_backend = os.environ.get("REDIS_URL", "redis://localhost:6379")
 
+print("\n" + "="*30)
+print(f"DEBUG BROKER URL: {broker_url}")
+print(f"DEBUG BACKEND URL: {result_backend}")
+print("="*30 + "\n")
+
 celery_app = Celery("tasks", broker=broker_url, backend=result_backend)
 
 @shared_task
