@@ -1,39 +1,46 @@
-import os
-import requests
-from celery import shared_task # Keep this if you are using Celery for background tasks
+import time
+from celery import Celery
+from transformers import pipeline
+from app.core.database import SessionLocal
+from app.models.task import AnalysisTask
 
-@shared_task
-def process_audio_task(audio_url: str):
-    """
-    Downloads audio from the given URL and sends it to the Hugging Face 
-    Inference API for transcription, completely bypassing local memory limits.
-    """
+# Initialize Celery (Using a local dummy broker for Windows testing)
+celery_app = Celery("tasks", broker="memory://", backend="cache+memory://")
+celery_app.conf.task_always_eager = True # Forces tasks to run locally
+
+# Load the real machine learning model
+print("Loading AI model... this might take a moment.")
+sentiment_analyzer = pipeline("sentiment-analysis")
+print("AI model loaded successfully!")
+
+@celery_app.task(bind=True)
+def process_audio_task(self, audio_url: str, task_id: int):
+    # 1. Simulate the transcription of a delivery call
+    time.sleep(2) 
+    mock_transcript = "Hello, I am outside your location with your package but the gate is locked."
+    
+    # 2. Run real AI sentiment analysis on the text
+    ai_result = sentiment_analyzer(mock_transcript)[0]
+    sentiment_label = ai_result['label'] 
+    
+    # 3. Map it to our new logistics business logic
+    dispute_risk = "High" if sentiment_label == "NEGATIVE" else "Low"
+    
+    insights = {
+        "sentiment": sentiment_label,
+        "fcr_status": dispute_risk
+    }
+    
+    # 4. Connect to the database and save the real AI results
+    db = SessionLocal()
     try:
-        # 1. Download the audio file from the frontend URL
-        audio_response = requests.get(audio_url)
-        if audio_response.status_code != 200:
-            return {"status": "error", "message": "Failed to fetch audio from URL."}
-
-        # 2. Send the binary audio data to Hugging Face
-        hf_api_key = os.environ.get("HF_API_KEY")
-        if not hf_api_key:
-            return {"status": "error", "message": "HF_API_KEY environment variable is missing."}
-
-        # Using OpenAI's Whisper-Small model hosted for free on Hugging Face
-        API_URL = "https://api-inference.huggingface.co/models/openai/whisper-small"
-        headers = {"Authorization": f"Bearer {hf_api_key}"}
-
-        hf_response = requests.post(API_URL, headers=headers, data=audio_response.content)
-
-        if hf_response.status_code != 200:
-            return {"status": "error", "message": f"Hugging Face API Error: {hf_response.text}"}
-
-        # 3. Extract and return the transcribed text
-        result = hf_response.json()
-        return {
-            "status": "success", 
-            "transcription": result.get("text", "No transcription generated.")
-        }
-
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+        db_task = db.query(AnalysisTask).filter(AnalysisTask.id == task_id).first()
+        if db_task:
+            db_task.transcript = mock_transcript
+            db_task.insights = insights
+            db_task.status = "COMPLETED"
+            db.commit()
+    finally:
+        db.close()
+        
+    print(f"Task {task_id} completed with real AI insights: {insights}")
