@@ -3,7 +3,7 @@ import requests
 from celery import shared_task
 
 @shared_task
-def process_audio_task(audio_url: str):
+def process_audio_task(audio_url: str, task_id: int):
     """
     Downloads audio from the given URL and sends it to the Hugging Face 
     Inference API for transcription, completely bypassing local memory limits.
