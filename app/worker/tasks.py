@@ -46,7 +46,7 @@ def process_audio_task(audio_url: str, task_id: int):
                 db.close()
             return {"status": "error", "message": "HF_API_KEY environment variable is missing."}
 
-        API_URL = "https://router.huggingface.co/models/openai/whisper-small"
+        API_URL = "https://api-inference.huggingface.co/models/openai/whisper-small"
         headers = {"Authorization": f"Bearer {hf_api_key}"}
         
         hf_response = requests.post(API_URL, headers=headers, data=audio_response.content)
