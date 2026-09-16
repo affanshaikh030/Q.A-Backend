@@ -1,6 +1,12 @@
 import os
 import requests
 from celery import shared_task
+from celery import Celery
+
+broker_url = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379")
+result_backend = os.environ.get("REDIS_URL", "redis://localhost:6379")
+
+celery_app = Celery("tasks", broker=broker_url, backend=result_backend)
 
 @shared_task
 def process_audio_task(audio_url: str, task_id: int):
