@@ -20,7 +20,7 @@ def process_audio_task(audio_url: str, task_id: int):
         
         if audio_response.status_code != 200:
             from app.core.database import SessionLocal 
-            from app.models import AnalysisTask 
+            from app.models.task import AnalysisTask
             db = SessionLocal()
             try:
                 db_task = db.query(AnalysisTask).filter(AnalysisTask.id == task_id).first()
@@ -35,7 +35,7 @@ def process_audio_task(audio_url: str, task_id: int):
         hf_api_key = os.environ.get("HF_API_KEY")
         if not hf_api_key:
             from app.core.database import SessionLocal 
-            from app.models import AnalysisTask 
+            from app.models.task import AnalysisTask
             db = SessionLocal()
             try:
                 db_task = db.query(AnalysisTask).filter(AnalysisTask.id == task_id).first()
@@ -53,7 +53,7 @@ def process_audio_task(audio_url: str, task_id: int):
         
         if hf_response.status_code != 200:
             from app.core.database import SessionLocal 
-            from app.models import AnalysisTask 
+            from app.models.task import AnalysisTask 
             db = SessionLocal()
             try:
                 db_task = db.query(AnalysisTask).filter(AnalysisTask.id == task_id).first()
@@ -69,7 +69,7 @@ def process_audio_task(audio_url: str, task_id: int):
         
         # 3. UPDATE THE DATABASE (Success - breaks the PENDING loop)
         from app.core.database import SessionLocal 
-        from app.models import AnalysisTask 
+        from app.models.task import AnalysisTask 
 
         db = SessionLocal()
         try:
@@ -85,7 +85,7 @@ def process_audio_task(audio_url: str, task_id: int):
 
     except Exception as e:
         from app.core.database import SessionLocal 
-        from app.models import AnalysisTask 
+        from app.models.task import AnalysisTask 
         
         db = SessionLocal()
         try:
