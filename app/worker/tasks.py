@@ -42,12 +42,38 @@ def process_audio_task(audio_url: str, task_id: int):
         if hf_response.status_code != 200:
             return {"status": "error", "message": f"Hugging Face API Error: {hf_response.text}"}
 
-        # 3. Extract and return the transcribed text
-        result = hf_response.json()
-        return {
-            "status": "success", 
-            "transcription": result.get("text", "No transcription generated.")
-        }
+    
+       # 3. Extract the transcribed text
+        transcription_text = result.get("text", "No transcription generated.")
+        
+        # 4. UPDATE THE DATABASE (This breaks the PENDING loop!)
+        from app.core.database import SessionLocal 
+        from app.models import AnalysisTask 
 
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+        db = SessionLocal()
+        try:
+            db_task = db.query(AnalysisTask).filter(AnalysisTask.id == task_id).first()
+            if db_task:
+                db_task.status = "SUCCESS"
+                db_task.transcription = transcription_text
+                db.commit()
+        finally:
+            db.close()
+            
+        return {"status": "success", "message": "Database updated."}
+
+    # This 'except' handles failures for the ENTIRE function
+            except Exception as     e:
+            from app.core.database import SessionLocal 
+            from app.models import AnalysisTask 
+            
+            db = SessionLocal()
+            try:
+                db_task = db.query(AnalysisTask).filter(AnalysisTask.id == task_id).first()
+                if db_task:
+                    db_task.status = "ERROR"
+                    db.commit()
+            finally:
+                db.close()
+                
+            return {"status": "error", "message": str(e)}
