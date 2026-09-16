@@ -166,12 +166,12 @@
             btn.disabled = true;
 
             try {
-                // 1. Send POST request to FastAPI backend
-               const response = await fetch('https://affan0510-courier-qa-api.hf.space/api/tasks', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ audio_url: urlInput })
-                });
+        // 1. Send POST request to FastAPI backend
+        const response = await fetch('https://q-a-backend-1.onrender.com/api/tasks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ audio_url: urlInput })
+        });
                 
                 if (!response.ok) throw new Error("Failed to create task");
                 const data = await response.json();
